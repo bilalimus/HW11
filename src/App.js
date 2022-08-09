@@ -1,32 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, createContext } from "react";
+import CourseGoalList from "./components/CourseGoals/CourseGoalList/CourseGoalList";
+import CourseInput from "./components/CourseGoals/CourseInput/CourseInput";
+import "./App.css";
+import ReactSwitch from "react-switch";
 
-import CourseGoalList from './components/CourseGoals/CourseGoalList/CourseGoalList';
-import CourseInput from './components/CourseGoals/CourseInput/CourseInput';
-import './App.css';
+export const ThemeContext = createContext(null);
 
 const App = () => {
   const [courseGoals, setCourseGoals] = useState([
-    { text: 'Do all exercises!', id: 'g1' },
-    { text: 'Finish the course!', id: 'g2' }
+    { text: "Do all exercises!", id: "g1" },
+    { text: "Finish the course!", id: "g2" },
   ]);
+  const [theme, setTheme] = useState("light");
 
-  const addGoalHandler = enteredText => {
-    setCourseGoals(prevGoals => {
+  const addGoalHandler = (enteredText) => {
+    setCourseGoals((prevGoals) => {
       const updatedGoals = [...prevGoals];
       updatedGoals.unshift({ text: enteredText, id: Math.random().toString() });
       return updatedGoals;
     });
   };
 
-  const deleteItemHandler = goalId => {
-    setCourseGoals(prevGoals => {
-      const updatedGoals = prevGoals.filter(goal => goal.id !== goalId);
+  const deleteItemHandler = (goalId) => {
+    setCourseGoals((prevGoals) => {
+      const updatedGoals = prevGoals.filter((goal) => goal.id !== goalId);
       return updatedGoals;
     });
   };
 
   let content = (
-    <p style={{ textAlign: 'center' }}>No goals found. Maybe add one?</p>
+    <p style={{ textAlign: "center" }}>No goals found. Maybe add one?</p>
   );
 
   if (courseGoals.length > 0) {
@@ -35,22 +38,31 @@ const App = () => {
     );
   }
 
+  const toggleTheme = () => {
+    setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
+  };
+
   return (
-    <div>
-      <section id="goal-form">
-        <CourseInput onAddGoal={addGoalHandler} />
-      </section>
-      <section id="goals">
-        {content}
-        {/* {courseGoals.length > 0 && (
-          <CourseGoalList
-            items={courseGoals}
-            onDeleteItem={deleteItemHandler}
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <div id={theme}>
+        <header className="header">
+          <label>{theme === "light" ? "Light Mode" : "Dark Mode"}</label>
+          <ReactSwitch
+            onChange={toggleTheme}
+            checked={theme === "dark"}
+            onColor="#000000"
+            
+            checkedIcon={false}
+            uncheckedIcon={false}
           />
-        ) // <p style={{ textAlign: 'center' }}>No goals found. Maybe add one?</p>
-        } */}
-      </section>
-    </div>
+        </header>
+        <section className="goal-form">
+          <CourseInput onAddGoal={addGoalHandler} />
+        </section>
+
+        <section id="goals">{content}</section>
+      </div>
+    </ThemeContext.Provider>
   );
 };
 
